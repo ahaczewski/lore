@@ -59,7 +59,7 @@ mod tests {
                 };
 
                 let (compressed_fragment, compressed_buffer) =
-                    compress::compress(fragment, &data, CompressionMode::Oodle)
+                    compress::compress(fragment, &data, CompressionMode::Zstd)
                         .expect("Compression failed");
                 let compressed_data = compressed_buffer.as_ref();
                 assert!((compressed_fragment.size_payload as usize) <= compressed_data.len());
