@@ -1,4 +1,10 @@
 [build]
+# NOTE: a per-target [target.<triple>] rustflags table fully REPLACES this
+# [build] list rather than merging with it. The lint flags (-W...) below only
+# affect warnings and can be safely dropped per-target, but the non-warning
+# values here — the --cfg flags the code compiles against (tokio_unstable,
+# uuid_unstable) and the codegen -C flags — MUST be duplicated in any
+# [target.*] block, or that target builds without them.
 rustflags = [
     # Needed for tokio metrics
     "--cfg", "tokio_unstable",
@@ -104,10 +110,26 @@ rustflags = [
     "--cfg", "uuid_unstable"
 ]
 
+# macOS: split-debuginfo=packed emits a separate .dSYM bundle (runs dsymutil);
+# the default "unpacked" leaves DWARF in the .o files and ships no .dSYM. Both
+# blocks repeat the [build] non-warning flags (see the note there).
 [target.x86_64-apple-darwin]
-# For macOS builds, always split debuginfo
 rustflags = [
-    "-C", "split-debuginfo=packed"
+    "--cfg", "tokio_unstable",
+    "-C", "force-unwind-tables=yes",
+    "-C", "force-frame-pointers=yes",
+    "-C", "split-debuginfo=packed",
+    "--cfg", "uuid_unstable"
+]
+
+# Apple Silicon — the actual macOS build target.
+[target.aarch64-apple-darwin]
+rustflags = [
+    "--cfg", "tokio_unstable",
+    "-C", "force-unwind-tables=yes",
+    "-C", "force-frame-pointers=yes",
+    "-C", "split-debuginfo=packed",
+    "--cfg", "uuid_unstable"
 ]
 
 [registry]
