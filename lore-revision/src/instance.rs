@@ -43,7 +43,7 @@ pub const ANCHOR_STAGED: &str = "anchor-staged";
 /// A unique identity for a repository instance (a local checkout).
 ///
 /// Each instance gets a stable `UUIDv7` generated once at creation time
-/// and stored in `.urc/instance`. The instance ID is used to derive
+/// and stored in `.lore/instance`. The instance ID is used to derive
 /// per-instance anchor keys in the mutable store, distinguishing one
 /// instance's checkout state from another when sharing a shared store.
 #[repr(C)]
@@ -80,7 +80,7 @@ impl InstanceId {
         &self.data
     }
 
-    /// Read an instance ID from the `.urc/instance` file.
+    /// Read an instance ID from the `.lore/instance` file.
     pub fn read_from_file(path: PathBuf) -> io::Result<Self> {
         let mut id = Self::default();
         // Synchronous read: config file, avoids thread hop and queuing behind
@@ -89,7 +89,7 @@ impl InstanceId {
         Ok(id)
     }
 
-    /// Write an instance ID to the `.urc/instance` file.
+    /// Write an instance ID to the `.lore/instance` file.
     pub async fn write_to_file(&self, path: PathBuf) -> io::Result<()> {
         let data = *self;
         lore_spawn_blocking!(move || {
